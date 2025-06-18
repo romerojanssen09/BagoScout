@@ -1,130 +1,150 @@
 # BagoScout - Job Portal
 
+## About
+
+BagoScout is a comprehensive job portal platform tailored for Bago City, connecting employers and job seekers with features like geospatial job matching, real-time communication, and smart recommendations.
+
 ## Recent Updates
 
-### Admin Area Enhancements
-- **Complete Admin Dashboard**: Enhanced with statistics, recent users, and messages
-- **Employer Management**: View and manage employer accounts with detailed profiles
-- **Job Seeker Management**: View and manage job seeker accounts with skills and fields
-- **Settings Page**: Configure site settings, email settings, and registration options
-- **Contact Messages**: View and manage messages from the contact form
+- Implemented real-time video calling feature
+- Added smart job matching algorithm based on skills and preferences
+- Enhanced user verification system
 
-### User Profile Enhancements
-- **Skills Management**: Job seekers can add and update their skills
-- **Work Fields**: Job seekers can specify their work fields of interest
-- **Business Fields**: Employers can add their business fields
+## System Architecture
 
-### Contact System
-- **Contact Form**: Users can send messages to site administrators
-- **Admin Notification**: Admins receive email notifications for new messages
-- **Message Management**: Admins can view, mark as read, and delete messages
+BagoScout is built with PHP on the backend and uses a combination of TailwindCSS and Alpine.js for the frontend. The system uses MySQL for data storage and Ably for real-time communication.
 
-### Database Updates
-- Added `contact_messages` table for storing user inquiries
-- Added `settings` table for site configuration
-- Added `fields` column to employers table
-- Added `fields` and `skills` columns to jobseekers table
+## System Flows
 
-## Installation
+### User Authentication Flow
+
+1. **Registration**:
+   - Step 1: User selects account type (employer or jobseeker)
+   - Step 2: User enters personal information (name, email, password)
+   - Step 3: User enters contact information (phone, address)
+   - Step 4: User uploads verification documents
+   - Step 5: User selects fields of expertise and skills (for jobseekers) or company information (for employers)
+
+2. **Login**:
+   - User enters email and password
+   - System verifies credentials and redirects to appropriate dashboard
+   - Optional "Remember Me" functionality for extended sessions
+
+3. **Account Verification**:
+   - After registration, user account status is set to "unverified"
+   - Admin reviews uploaded documents
+   - Account status is updated to "active" when verified
+   - Email notifications are sent to users when verification status changes
+
+### Employer Flows
+
+1. **Job Posting**:
+   - Employer creates a new job listing with title, description, requirements, and location
+   - Job is saved as draft or published immediately
+   - Admin approval may be required for new employers
+
+2. **Candidate Management**:
+   - Review applications for posted jobs
+   - Filter candidates by skills, experience, or application status
+   - Shortlist candidates of interest
+   - Schedule interviews with shortlisted candidates
+
+3. **Communication**:
+   - Real-time messaging with applicants
+   - Video/audio call functionality for remote interviews
+   - Email notifications for important updates
+
+### Jobseeker Flows
+
+1. **Job Search**:
+   - Browse available jobs with search and filter options
+   - View job details and company information
+   - See location-based job recommendations
+   - Save favorite jobs for later application
+
+2. **Application Process**:
+   - Apply to jobs with pre-filled information from profile
+   - Track application status (pending, reviewed, shortlisted, rejected)
+   - Receive notifications about application updates
+
+3. **Profile Management**:
+   - Update skills, experience, and work preferences
+   - Upload portfolio documents
+   - Manage visibility settings
+
+### Real-time Communication System
+
+1. **Messaging**:
+   - Direct messaging between employers and jobseekers
+   - Notification system for new messages
+   - Message history and conversation tracking
+
+2. **Video/Audio Calls**:
+   - WebRTC-based call system using Ably for signaling
+   - Call session management and recording
+   - Call history for reference
+
+3. **Notification System**:
+   - Real-time notifications for messages, calls, application updates
+   - Email notifications for important events
+   - In-app notification center
+
+### Admin Dashboard
+
+1. **User Management**:
+   - Review and verify new user registrations
+   - Manage user accounts (suspend, activate, delete)
+   - Handle user reports and issues
+
+2. **Job Monitoring**:
+   - Review and approve job postings
+   - Monitor job activity and applications
+   - Generate statistics and reports
+
+3. **System Management**:
+   - Configure system settings
+   - Monitor system performance
+   - Backup and restore data
+
+## Database Schema
+
+The system uses a relational database with the following core tables:
+
+- `users`: Core user information and authentication
+- `employers`: Employer-specific information
+- `jobseekers`: Jobseeker-specific information
+- `jobs`: Job listings
+- `applications`: Job applications
+- `calls`: Call records between users
+- `notifications`: System notifications
+
+## Technical Details
+
+- **Backend**: PHP 8.x
+- **Frontend**: HTML5, TailwindCSS, Alpine.js
+- **Database**: MySQL
+- **Real-time Communication**: Ably
+- **Video Calls**: WebRTC with Ably signaling
+
+## Installation and Setup
 
 1. Clone the repository
-2. Import the database schema
-3. Configure database connection in `config/database.php`
-4. Run the SQL updates in `db_updates.sql`
+2. Configure database in `config/database.php`
+3. Set up API keys in `config/api_keys.php`
+4. Run the database migrations
+5. Set up a web server with PHP 8.x
+6. Access the application through the web server
 
-## Features
+## Contributing
 
-- User registration and authentication
-- Account verification with ID and photo upload
-- Job posting and application system
-- Admin approval workflow
-- Profile management
-- Contact system
-- Responsive design
+Contributions to BagoScout are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License.
-
-# BagoScout Call Activity Integration
-
-This document outlines the enhancements made to better integrate call activities with the messaging interface in the BagoScout application.
-
-## Database Structure
-
-The system uses two main tables for calls and messages:
-
-- **calls** - Stores call records with details like initiator, recipient, status, and duration
-- **messages** - Stores messaging data, including system messages about calls
-
-Key fields in the `calls` table:
-- `call_id`: Unique identifier for the call
-- `initiator_id`: User who initiated the call
-- `recipient_id`: User who received the call
-- `call_type`: Audio or video call
-- `status`: Current call status (initiated, accepted, rejected, ended, missed)
-- `duration`: Call duration in seconds
-- `created_at`: When the call was started
-
-## Call Integration Improvements
-
-### 1. Database Schema Enhancements
-
-- Added the `is_system` column to the messages table to identify system messages
-- Added additional indexes to optimize query performance:
-  - `is_system` index for faster filtering of system messages
-  - `created_at` and `status` indexes on the calls table
-
-### 2. API Enhancements (api/messages.php)
-
-- Enhanced message queries to JOIN with the calls table to retrieve call details
-- Improved filtering using the new `is_system` flag
-- Added proper correlation between call records and system messages
-- Added `formatCallDuration()` function to consistently format call durations on the server-side
-
-### 3. Frontend Improvements
-
-#### Call Handler (call-handler.js)
-
-- Modified `addSystemMessage()` to pass the call_id to system messages
-- Improved system message creation for different call states (missed, rejected, accepted)
-
-#### WebRTC Handler (webrtc.js)
-
-- Enhanced `addSystemMessage()` to include call_id with system messages
-- Updated message formatting to use server-provided call duration formatting
-
-#### Messaging UI (employer-messaging.js & seeker-messaging.js)
-
-- Enhanced display of call information in the message list
-- Added visual indicators for different call states with appropriate icons and colors
-- Added proper call duration formatting using server-provided formatted durations
-
-## Call Status Display
-
-The system now displays call messages with appropriate styling based on status:
-
-| Call Status | Icon Color | Description |
-|-------------|------------|-------------|
-| Ended       | Green      | Successfully completed call with duration |
-| Missed      | Yellow     | Call was not answered |
-| Rejected    | Red        | Call was actively declined |
-| Initiated   | Blue       | Call was started (generic) |
-
-For ended calls, the duration is displayed in a human-readable format (hours, minutes, seconds).
-
-## System Message Flow
-
-1. When a call event occurs (start, end, missed, etc.), the system:
-   - Updates the call record in the database
-   - Creates a system message in the conversation
-   - Links the system message to the call via the call_id
-   - Publishes real-time updates through Ably
-
-2. When displaying messages, the system:
-   - Identifies call-related system messages
-   - Retrieves associated call details from the database
-   - Formats and styles the message based on call status
-   - Shows call duration for completed calls
-
-This integration provides users with a complete history of their call activities directly within their messaging interface. "# BagoScout" 
+Copyright © 2024 BagoScout. All rights reserved.
