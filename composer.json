@@ -1,0 +1,16 @@
+{
+    "name": "bagoscout/app",
+    "description": "BagoScout application with WebSocket and Alby integration",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "cboden/ratchet": "^0.4.4",
+        "phpmailer/phpmailer": "^6.10",
+        "ably/ably-php": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "BagoScout\\": "src/"
+        }
+    }
+}
