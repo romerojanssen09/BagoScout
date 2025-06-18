@@ -8,8 +8,22 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 // Determine the path prefix based on the current directory depth
 $pathPrefix = '';
 
+$userRole = isset($_SESSION['user_role']) ? $_SESSION['user_role'] : 'guest';
+
 // Get the current script path
 $currentPath = $_SERVER['PHP_SELF'];
+
+// Determine the path prefix based on the current script path
+if($userRole == "employer"){
+    // Employer role, set path prefix for employer dashboard
+    $pathPrefix = '../auth-user/employer/';
+} elseif($userRole == "jobseeker"){
+    // Job seeker role, set path prefix for job seeker dashboard
+    $pathPrefix = '../auth-user/jobseeker/';
+} else {
+    // Default path prefix for guest or other roles
+    $pathPrefix = '';
+}
 
 // Root level (index.php)
 if (strpos($currentPath, '/bagoscout/index.php') !== false) {
